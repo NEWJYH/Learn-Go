@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"math"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -31,7 +33,7 @@ func main() {
 	defer wd.Quit()
 
 	// 마지막 페이지 번호 얻기
-	totalPage := getPageMax(wd)
+	totalPage := getMaxPageNumber(wd)
 	fmt.Println(totalPage)
 
 	// 전체 페이지 url 획득
@@ -136,18 +138,11 @@ func getHtml(wd selenium.WebDriver) string{
 }
 
 
-
-
-
 // getPageMax 총 페이지 확인 
-func getPageMax(wd selenium.WebDriver) int {
-	pageURL := baseURL + "&start=" + strconv.Itoa(MAXCOUNT)
-	fmt.Println("page URL", pageURL)
-	openPage(wd, pageURL)
+func getMaxPageNumber(wd selenium.WebDriver) int {
+	// openPage 웹 페이지 열기
+	openPage(wd, baseURL)
 	
-	// 하단으로 내리기
-	scrollDown(wd, slowScrollScript)
-
 	// 페이지의 HTML 소스코드 가져오기
 	htmlSrc := getHtml(wd)
 	
@@ -156,13 +151,18 @@ func getPageMax(wd selenium.WebDriver) int {
 	if err != nil {
 			panic(err)
 	}
+	Div := doc.Find(".jobsearch-JobCountAndSortPane-jobCount")
+	spanText := Div.Find("span").First().Text()
+	
+	// 정규표현식으로 문자열에서 숫자 추출
+	re := regexp.MustCompile(`\d+`)
+	matches := re.FindAllString(spanText, -1)
+	count, _ := strconv.Atoi(matches[0]) 
 
-	lastDiv := doc.Find("nav[role='navigation']").Children().Last()
-	buttonText := lastDiv.Find("button").Text()
-	lastPageNumber, _ := strconv.Atoi(buttonText)
+
+	lastPageNumber := int(math.Ceil(float64(count) / 50))
 	return lastPageNumber
 }
-
 
 // getPage 페이지 url얻기
 func getPageURL(page int) string {
