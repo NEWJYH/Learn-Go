@@ -10,7 +10,7 @@ import (
 type Dictionary map[string]string
 
 
-// ErrorNotFond Not Found Error
+// Error
 var (
 	ErrNotFound = errors.New("not Found")
 	ErrWordExists = errors.New("that word already exist")
