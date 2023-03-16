@@ -191,16 +191,16 @@ func getPageURL(baseURL string, page int) string {
 func extractJob(s *goquery.Selection, c chan<- extractedJob) {
 	a := s.Find(".jobTitle a:first-child")
 	id, _:= a.Attr("data-jk")
-	companyName := cleanString(s.Find(".companyName").Text())
-	companyLocation := cleanString(s.Find(".companyLocation").Text())
-	title := cleanString(a.Find("span").Text())
-	salary := cleanString(s.Find(".salary-snippet-container > div").Text())
-	summary := cleanString(s.Find(".result-footer > .job-snippet").Text())
+	companyName := CleanString(s.Find(".companyName").Text())
+	companyLocation := CleanString(s.Find(".companyLocation").Text())
+	title := CleanString(a.Find("span").Text())
+	salary := CleanString(s.Find(".salary-snippet-container > div").Text())
+	summary := CleanString(s.Find(".result-footer > .job-snippet").Text())
 	c <- createExtractedJob(id, companyName, title, companyLocation, salary, summary)
 }
 
-// cleanString 문자열 공백제거
-func cleanString(str string) string {
+// CleanString 문자열 공백제거
+func CleanString(str string) string {
 	return strings.Join(strings.Fields(strings.TrimSpace(str)), " ")	
 }
 
